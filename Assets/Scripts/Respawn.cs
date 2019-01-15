@@ -40,24 +40,38 @@ public class Respawn : MonoBehaviour {
             score.text = "Puntaje: " + pantalla.GetScore().ToString();
             Destroy(other.gameObject);
             Instantiate(explosion, transform.position, transform.rotation);
+            teleport(this.gameObject);
         }
         if (other.CompareTag("Respawn"))
         {
-            lanzamientos--;
-            maxtiros();
+            if (lanzamientos != 0)           
+                lanzamientos--;                        
+            maxtiros();               
         }
         if (other.CompareTag("Bocin"))
         {
             pantalla.SetScore(pantalla.GetScore() + 6);
             score.text = "Puntaje: " + pantalla.GetScore().ToString();
+            teleport(this.gameObject);
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && lanzamientos != 0)
+            teleport(gameObject);
+        else if (collision.gameObject.name.Equals("seccion 1") || collision.gameObject.name.Equals("seccion 2"))
+            teleport(gameObject);
+    }
+
     private void maxtiros()
     {
         tiros.text = "Tiros: " + lanzamientos;
     }
 
-
-
+    private void teleport(GameObject obj)
+    {
+        obj.transform.position = new Vector3(1.562f, 1.036f, -0.501f);
+    }
 }
 
