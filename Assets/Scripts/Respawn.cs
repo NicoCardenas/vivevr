@@ -23,7 +23,7 @@ public class Respawn : MonoBehaviour {
         pt = GameObject.FindGameObjectWithTag("canvas");
         pantalla = pt.GetComponent<Score>();
         goal = 0;
-        score.text = "Puntaje:" + goal.ToString();
+        score.text = "Puntos: " + goal.ToString();
         x = this.transform.position.x;
         y = this.transform.position.y;
         z = this.transform.position.z;
@@ -37,12 +37,12 @@ public class Respawn : MonoBehaviour {
         if (other.CompareTag("Mechas"))
         {
             pantalla.SetScore(pantalla.GetScore() + 3);
-            score.text = "Puntaje: " + pantalla.GetScore().ToString();
+            score.text = "Puntos: " + pantalla.GetScore().ToString();
             Destroy(other.gameObject);
             Instantiate(explosion, transform.position, transform.rotation);
             teleport(this.gameObject);
         }
-        if (other.CompareTag("Respawn"))
+        if (other.CompareTag("Respawn") || other.CompareTag("Ground"))
         {
             if (lanzamientos != 0)           
                 lanzamientos--;                        
@@ -59,19 +59,29 @@ public class Respawn : MonoBehaviour {
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground") && lanzamientos != 0)
+        {
             teleport(gameObject);
+            if (lanzamientos != 0)
+                lanzamientos--;
+            maxtiros();
+        }            
         else if (collision.gameObject.name.Equals("seccion 1") || collision.gameObject.name.Equals("seccion 2"))
             teleport(gameObject);
     }
 
     private void maxtiros()
     {
-        tiros.text = "Tiros: " + lanzamientos;
+        tiros.text = "Tejo x " + lanzamientos;
     }
 
     private void teleport(GameObject obj)
     {
-        obj.transform.position = new Vector3(1.562f, 1.036f, -0.501f);
+        Rigidbody rb = obj.GetComponent<Rigidbody>();
+        rb.ResetInertiaTensor();
+        rb.MovePosition(new Vector3(1.562f, 1.036f, -0.501f));
+        obj.transform.rotation = Quaternion.identity;
+        rb.AddForce(new Vector3(0f,0f,0f), ForceMode.Impulse);        
+        //rb.AddForce(0f,0f,0f);        
     }
 }
 
