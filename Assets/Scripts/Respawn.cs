@@ -9,7 +9,7 @@ public class Respawn : MonoBehaviour {
     private int goal;
     [SerializeField]
     private Text score;
-    private float x, y, z;
+    private float xinit, yinit, zinit;
     GameObject pt;
     private Score pantalla;
 
@@ -24,9 +24,10 @@ public class Respawn : MonoBehaviour {
         pantalla = pt.GetComponent<Score>();
         goal = 0;
         score.text = "Puntos: " + goal.ToString();
-        x = this.transform.position.x;
-        y = this.transform.position.y;
-        z = this.transform.position.z;
+        xinit = this.transform.position.x;
+        yinit = this.transform.position.y;
+        zinit = this.transform.position.z;
+        Debug.Log("Initial position: " + xinit + " " + yinit + " " + zinit);
 
         lanzamientos = 5;
         maxtiros();
@@ -76,12 +77,15 @@ public class Respawn : MonoBehaviour {
 
     private void teleport(GameObject obj)
     {
+        //Debug.Log("<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>");
         Rigidbody rb = obj.GetComponent<Rigidbody>();
-        rb.ResetInertiaTensor();
-        rb.MovePosition(new Vector3(1.562f, 1.036f, -0.501f));
-        obj.transform.rotation = Quaternion.identity;
-        rb.AddForce(new Vector3(0f,0f,0f), ForceMode.Impulse);        
-        //rb.AddForce(0f,0f,0f);        
+        //rb.ResetInertiaTensor();        
+        obj.transform.rotation.SetEulerRotation(270f, 0f,0f);
+        rb.velocity.Set(0f, 0f, 0f);
+        rb.angularVelocity.Set(0f, 0f, 0f);
+        rb.AddForce(Vector3.zero);
+        //obj.transform.position.Set(xinit, yinit, zinit);
+        rb.MovePosition(new Vector3(xinit, yinit, zinit));
     }
 }
 
