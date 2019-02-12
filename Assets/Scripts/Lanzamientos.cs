@@ -17,4 +17,9 @@ public class Lanzamientos : MonoBehaviour {
     {
         this.tiros = X;
     }
+
+    public void SubLanzamientos(int x)
+    {
+        tiros -= x;
+    }
 }

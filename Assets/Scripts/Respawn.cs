@@ -6,33 +6,37 @@ using UnityEngine.UI;
 public class Respawn : MonoBehaviour {
 
     public GameObject explosion;
-    private int goal;
     [SerializeField]
     private Text score;
+    [SerializeField]
+    private Text tiros;
     private float xinit, yinit, zinit;
-    GameObject pt;
+    private GameObject pt;
     private Score pantalla;
-
-    int lanzamientos;
-    public Text tiros;
+    private Generator generator;
+    private Lanzamientos lanzamientos;
+    
 
 
     // Use this for initialization
     void Start()
     {
         pt = GameObject.FindGameObjectWithTag("canvas");
+        score = GameObject.Find("Score").GetComponent<Text>();
+        tiros = GameObject.Find("lanzamientos").GetComponent<Text>();
         pantalla = pt.GetComponent<Score>();
-        goal = 0;
-        score.text = "Puntos: " + goal.ToString();
+        lanzamientos = pt.GetComponent<Lanzamientos>();
+        generator = pt.GetComponent<Generator>();
+
+        
+        score.text = "Puntaje: 0";
         xinit = this.transform.position.x;
         yinit = this.transform.position.y;
         zinit = this.transform.position.z;
-        Debug.Log("Initial position: " + xinit + " " + yinit + " " + zinit);
-
-        lanzamientos = 5;
+                
         maxtiros();
     }
-
+    
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Mechas"))
@@ -45,9 +49,11 @@ public class Respawn : MonoBehaviour {
         }
         if (other.CompareTag("Respawn") || other.CompareTag("Ground"))
         {
-            if (lanzamientos != 0)           
-                lanzamientos--;                        
-            maxtiros();               
+            if (lanzamientos.GetLanzamientos() != 0)
+            {
+                lanzamientos.SubLanzamientos(1);
+                teleport(gameObject);                
+            }            
         }
         if (other.CompareTag("Bocin"))
         {
@@ -55,37 +61,35 @@ public class Respawn : MonoBehaviour {
             score.text = "Puntaje: " + pantalla.GetScore().ToString();
             teleport(this.gameObject);
         }
+        maxtiros();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground") && lanzamientos != 0)
+        if (collision.gameObject.CompareTag("Ground") && lanzamientos.GetLanzamientos() != 0)
         {
             teleport(gameObject);
-            if (lanzamientos != 0)
-                lanzamientos--;
-            maxtiros();
-        }            
+            lanzamientos.SubLanzamientos(1);
+        }
         else if (collision.gameObject.name.Equals("seccion 1") || collision.gameObject.name.Equals("seccion 2"))
-            teleport(gameObject);
+            if (lanzamientos.GetLanzamientos() != 0)
+            {
+                lanzamientos.SubLanzamientos(1);
+                teleport(gameObject);                
+            }
+
+        maxtiros();
     }
 
     private void maxtiros()
     {
-        tiros.text = "Tejo x " + lanzamientos;
+        tiros.text = "Tejo x " + lanzamientos.GetLanzamientos();
     }
 
     private void teleport(GameObject obj)
     {
-        //Debug.Log("<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        Rigidbody rb = obj.GetComponent<Rigidbody>();
-        //rb.ResetInertiaTensor();        
-        obj.transform.rotation.SetEulerRotation(270f, 0f,0f);
-        rb.velocity.Set(0f, 0f, 0f);
-        rb.angularVelocity.Set(0f, 0f, 0f);
-        rb.AddForce(Vector3.zero);
-        //obj.transform.position.Set(xinit, yinit, zinit);
-        rb.MovePosition(new Vector3(xinit, yinit, zinit));
+        Destroy(obj);
+        generator.instance(xinit, yinit, zinit);        
     }
 }
 
